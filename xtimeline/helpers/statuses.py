@@ -1,6 +1,6 @@
-__author__ = 'Tony.Shao'
 #!/usr/bin python
 # -*- coding: utf-8 -*-
+__author__ = 'Tony.Shao'
 
 import timelib
 from xtimeline.helpers import when, base62
@@ -84,17 +84,23 @@ def sina_homeline_parser(statuses):
         _status = sina_status_parser(status)
         _user = sina_user_parser(status)
         _status['user'] = _user
+        _status['uid'] = _user['id']
         _status['is_retweet'] = 0
         _status['retweeted_status_id'] = 0
         retweeted_status = status.get('retweeted_status', None)
         if retweeted_status:
-            _retweeted_status = sina_status_parser(retweeted_status)
-            _retweeted_status_user = sina_user_parser(retweeted_status)
-            _retweeted_status['user'] = _retweeted_status_user
+            if retweeted_status.get('deleted', 0):
+                _retweeted_status = sina_status_parser(retweeted_status)
+            else:
+                _retweeted_status = sina_status_parser(retweeted_status)
+                _retweeted_status_user = sina_user_parser(retweeted_status)
+                _retweeted_status['user'] = _retweeted_status_user
+                _retweeted_status['uid'] = _retweeted_status_user['id']
             _retweeted_status['retweeted_status_id'] = 0
             _retweeted_status['is_retweet'] = 0
             _status['retweeted_status_id'] = _retweeted_status['id']
             _status['is_retweet'] = 1
+            _statuses.append(_retweeted_status)
         _statuses.append(_status)
     return _statuses
 
@@ -127,6 +133,7 @@ def sina_user_parser(status):
     user = status.get('user', None)
     if user:
         status_user = {
+            "_id": user['id'],
             "id": user['id'],
             "screen_name": user['screen_name'],
             "name": user['name'],

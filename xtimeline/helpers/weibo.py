@@ -1,7 +1,6 @@
-__author__ = 'Tony.Shao'
 #!/usr/bin python
 # -*- coding: utf-8 -*-
-
+__author__ = 'Tony.Shao'
 import traceback
 from xtimeline.helpers.statuses import sina_homeline_parser
 
@@ -31,8 +30,7 @@ def get_home_timeline(access_token, expires_in, since_id=0, max_id=0, count=100)
         print traceback.format_exc()
 
 
-
-def get_statuses_counts(ids, access_token, expires_in, openid=None, platform_id=1):
+def get_statuses_counts(ids, access_token, expires_in):
     """
     批量获取转发评论数，新浪100个，腾讯30个， id之间用逗号隔开
     """
@@ -48,3 +46,11 @@ def get_statuses_counts(ids, access_token, expires_in, openid=None, platform_id=
         }
         results.append(result)
     return results
+
+
+def friendships_create(uid, access_token, expires_in):
+    api = APIClient()
+    api.set_access_token(access_token=access_token, expires=expires_in)
+    if api.is_expires():
+        return
+    api.get.friendships__create(uid=uid)
