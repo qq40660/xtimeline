@@ -5,8 +5,6 @@ __author__ = 'Tony.Shao'
 import timelib
 from xtimeline.helpers import when, base62
 
-
-
 def sina_comments_parser(status):
     _status = dict()
     _status['id'] = status.id

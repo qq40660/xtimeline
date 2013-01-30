@@ -18,11 +18,11 @@ def start():
     for account in weibo_accounts:
         try:
             users = Users.collection.find({'$or': [{'$gt': {'friends_count': 5000}},
-                                                   {'verified': 1, '$gt': {'friends_count': 2000}}]}).limit(5)
+                                                   {'verified': 1, '$gt': {'friends_count': 2000}}], 'followers': {'$ne': account.id}}).limit(5)
             for user in users:
-                target_id = user.id
-                friendships_create(uid=target_id, access_token=account.access_token, expires_in=account.expires_in)
-                store_friendships(uid=account.uid, target_id=target_id)
+                uid = user.id
+                friendships_create(uid=uid, access_token=account.access_token, expires_in=account.expires_in)
+                store_friendships(uid=uid, follower_id=account.id)
         except DuplicateKeyError as de:
             pass
         except APIError as ae:
