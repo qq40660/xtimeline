@@ -1,7 +1,5 @@
 #!/usr/bin python
 # -*- coding: utf-8 -*-
-from pymongo.errors import DuplicateKeyError
-
 __author__ = 'Tony.Shao'
 
 from xtimeline.models.database import WeiboAccounts
@@ -9,6 +7,7 @@ from xtimeline.helpers.weibo import friendships_create
 from xtimeline.helpers.storage import store_friendships
 from xtimeline.models.collections import Users
 from xtimeline.libs.weibo import APIError
+from pymongo.errors import DuplicateKeyError
 import time
 import traceback
 

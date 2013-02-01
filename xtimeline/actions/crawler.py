@@ -12,7 +12,7 @@ import time
 
 def start():
     """
-    crawler start....GO GO GO
+    crawler start....GO GO GO GO
     """
     weibo_accounts = WeiboAccounts.query.filter(WeiboAccounts.status == 1, WeiboAccounts.expires_in > int(time.time())).all()
     for account in weibo_accounts:
