@@ -32,11 +32,7 @@ def get_home_timeline(access_token, expires_in, since_id=0, max_id=0, count=100)
 
 def get_statuses_counts(ids, access_token, expires_in):
     """
-    逗号分割，最多一百个
-    :param ids:
-    :param access_token:
-    :param expires_in:
-    :return:
+    批量获取转发评论数，新浪100个，腾讯30个， id之间用逗号隔开
     """
     api = APIClient()
     api.set_access_token(access_token=access_token, expires=expires_in)
@@ -51,26 +47,27 @@ def get_statuses_counts(ids, access_token, expires_in):
         results.append(result)
     return results
 
+def get_friendships_followers(ids, access_token, expires_in, count=200, cursor=0):
+    """
+    批量获取转发评论数，新浪100个，腾讯30个， id之间用逗号隔开
+    """
+    api = APIClient()
+    api.set_access_token(access_token=access_token, expires=expires_in)
+    resp = api.get.friendships__followers(ids=ids)
+    results = []
+    users = resp.users
+    for user in users:
+        result = {
+            'id': data['id'],
+            'comments_count': data['comments'],
+            'reposts_count': data['reposts']
+        }
+        results.append(result)
+    return results
 
 def friendships_create(uid, access_token, expires_in):
     api = APIClient()
     api.set_access_token(access_token=access_token, expires=expires_in)
     if api.is_expires():
         return
-    api.get.friendships__create(uid=uid)
-
-
-def get_repost_timeline_ids(wid, access_token, expires_in, since_id=0, count=200):
-
-    api = APIClient()
-    api.set_access_token(access_token=access_token, expires=expires_in)
-    resp = api.get.statuses__repost_timeline__ids(id=wid,since_id=since_id)
-    results = []
-    status_ids = resp.get('statuses', None)
-    for status_id in status_ids:
-        result = {
-            'wid': status_id,
-            'retweeted_status_id': wid
-        }
-        results.append(result)
-    return results
+    api.post.friendships__create(uid=uid)

@@ -5,6 +5,8 @@ __author__ = 'Tony.Shao'
 import timelib
 from xtimeline.helpers import when, base62
 
+
+
 def sina_comments_parser(status):
     _status = dict()
     _status['id'] = status.id
@@ -80,9 +82,11 @@ def sina_homeline_parser(statuses):
     _statuses = []
     for status in statuses:
         _status = sina_status_parser(status)
-        _user = sina_user_parser(status)
-        _status['user'] = _user
-        _status['uid'] = _user['id']
+        user = status.get('user', None)
+        _user = sina_user_parser(user)
+        if _user:
+            _status['user'] = _user
+            _status['uid'] = _user['id']
         _status['is_retweet'] = 0
         _status['retweeted_status_id'] = 0
         retweeted_status = status.get('retweeted_status', None)
@@ -91,7 +95,8 @@ def sina_homeline_parser(statuses):
                 _retweeted_status = sina_status_parser(retweeted_status)
             else:
                 _retweeted_status = sina_status_parser(retweeted_status)
-                _retweeted_status_user = sina_user_parser(retweeted_status)
+                retweeted_status_user = retweeted_status.get('user', None)
+                _retweeted_status_user = sina_user_parser(retweeted_status_user)
                 _retweeted_status['user'] = _retweeted_status_user
                 _retweeted_status['uid'] = _retweeted_status_user['id']
             _retweeted_status['retweeted_status_id'] = 0
@@ -125,10 +130,9 @@ def sina_status_parser(status):
         _status['comments_count'] = status.get('comments_count', 0)
     return _status
 
-def sina_user_parser(status):
-    if status is None:
+def sina_user_parser(user):
+    if user is None:
         return
-    user = status.get('user', None)
     if user:
         status_user = {
             "_id": user['id'],
