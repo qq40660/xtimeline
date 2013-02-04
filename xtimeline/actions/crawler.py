@@ -20,9 +20,10 @@ def start():
             statuses = get_home_timeline(access_token=account.access_token, expires_in=account.expires_in)
             counts = store_timeline(statuses)
             print counts
-            time.sleep(1 * random.randint(1, 10))
         except Exception:
             print traceback.format_exc()
+        finally:
+            time.sleep(1 * random.randint(1, 10))
 
 if __name__ == '__main__':
     while True:
