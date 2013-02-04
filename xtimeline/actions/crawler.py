@@ -28,4 +28,4 @@ def start():
 if __name__ == '__main__':
     while True:
         start()
-        time.sleep(60 * 5)
+        time.sleep(60)
