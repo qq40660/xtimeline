@@ -9,23 +9,28 @@ __author__ = 'Tony.Shao'
 def store_status(status):
     if status is None:
         return
-    if status.get('deleted', 0):
-        stored_status = Statuses.collection.find_one(status['_id'])
-        if stored_status:
-            Statuses.collection.update({'_id': status['_id']}, {"$set": {'deleted': 1}})
-        else:
-            status = Statuses(**status)
-            status.save()
-    else:
-        status = Statuses(**status)
-        status.save()
+    document = Statuses.collection.find_one(status['_id'])
+    if document:
+        status = update_mongo_document(document=document, data=status)
+    status = Statuses(**status)
+    status.save()
 
 
 def store_user(user):
     if user is None:
         return
+    document = Users.collection.find_one(user['_id'])
+    if document:
+        user = update_mongo_document(document=document, data=user)
     user = Users(**user)
     user.save()
+
+
+def update_mongo_document(document, data):
+    document = dict(document)
+    document.update(data)
+    return document
+
 
 def store_status_history(status):
     """
@@ -34,6 +39,7 @@ def store_status_history(status):
     :return:
     """
     pass
+
 
 def store_user_history(user):
     """
@@ -68,9 +74,13 @@ def store_timeline(timeline):
 def store_friendships(uid, follower_id):
     user = Users.collection.find_one(uid)
     if user:
-        user.followers = follower_id
+        followers = user.get('followers', [])
+        if not isinstance(followers, list) and not isinstance(followers, tuple):
+            followers = [followers]
+        followers.append(follower_id)
+        user.followers = followers
         user.save()
-    friendship = Friendships(uid=uid, follower_id=follower_id, status=1, created_at = when.now())
+    friendship = Friendships(uid=uid, follower_id=follower_id, status=1, created_at=when.now())
     friendship.save()
 
 

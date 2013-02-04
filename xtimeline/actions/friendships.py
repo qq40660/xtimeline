@@ -1,5 +1,6 @@
 #!/usr/bin python
 # -*- coding: utf-8 -*-
+from xtimeline.helpers import when
 
 __author__ = 'Tony.Shao'
 
@@ -27,18 +28,23 @@ def start():
                 print uid
                 friendships_create(uid=uid, access_token=account.access_token, expires_in=account.expires_in)
                 store_friendships(uid=uid, follower_id=account.uid)
-                time.sleep(60 * random.randint(1, 10))
         except DuplicateKeyError as de:
             pass
         except APIError as ae:
             if ae.error_code in [10013, 20003]:
                 pass
             if ae.error_code in [20506]:
-                if uid:
-                    store_friendships(uid=uid, follower_id=account.uid)
+                try:
+                    if uid:
+                        store_friendships(uid=uid, follower_id=account.uid)
+                except DuplicateKeyError as de:
+                    pass
             print traceback.format_exc()
         except Exception as e:
             print traceback.format_exc()
+        finally:
+            print '[CURRENT_TIME: %s]' % when.now()
+            time.sleep(60 * random.randint(1, 10))
 
 if __name__ == '__main__':
     while True:
