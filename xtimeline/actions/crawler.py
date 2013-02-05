@@ -10,7 +10,7 @@ import time
 import random
 import traceback
 
-def start():
+def crawler():
     """
     crawler start....GO GO GO GO
     """
@@ -25,7 +25,10 @@ def start():
         finally:
             time.sleep(1 * random.randint(1, 10))
 
-if __name__ == '__main__':
+def start():
     while True:
-        start()
+        crawler()
         time.sleep(60)
+
+if __name__ == '__main__':
+    start()

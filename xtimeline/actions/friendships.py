@@ -15,8 +15,7 @@ import time
 import traceback
 import random
 
-
-def start():
+def creator():
     weibo_accounts = WeiboAccounts.query.filter(WeiboAccounts.status == 1, WeiboAccounts.expires_in > int(time.time())).all()
     for account in weibo_accounts:
         uid = 0
@@ -46,7 +45,10 @@ def start():
             print '[CURRENT_TIME: %s]' % when.now()
             time.sleep(60 * random.randint(1, 10))
 
-if __name__ == '__main__':
+def start():
     while True:
-        start()
+        creator()
         time.sleep(60 * 10)
+
+if __name__ == '__main__':
+    start()
