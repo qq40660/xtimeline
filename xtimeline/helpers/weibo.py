@@ -5,6 +5,8 @@ import traceback
 from xtimeline.helpers.statuses import sina_homeline_parser
 
 from xtimeline.libs.weibo import APIClient
+from xtimeline.helpers import weibologin
+
 
 def get_home_timeline(access_token, expires_in, since_id=0, max_id=0, count=100):
     """
@@ -16,10 +18,12 @@ def get_home_timeline(access_token, expires_in, since_id=0, max_id=0, count=100)
         if api.is_expires():
             error_message = '授权码过期，请重新授权！'
             #TODO 重新授权
+            refresh_access_token()
             return
         if max_id > 0:
-            max_id -= 1 #偏移一个微薄
+            max_id -= 1 # 偏移一个微薄
         resp = api.get.statuses__home_timeline(since_id=since_id, max_id=max_id, count=count)
+        statuses = None
         if resp:
             statuses = resp.get('statuses', None)
         if statuses:
@@ -37,6 +41,11 @@ def get_statuses_counts(ids, access_token, expires_in):
     api = APIClient()
     api.set_access_token(access_token=access_token, expires=expires_in)
     resp = api.get.statuses__count(ids=ids)
+    if api.is_expires():
+        error_message = '授权码过期，请重新授权！'
+        #TODO 重新授权
+        refresh_access_token()
+        return
     results = []
     for data in resp:
         result = {
@@ -47,27 +56,43 @@ def get_statuses_counts(ids, access_token, expires_in):
         results.append(result)
     return results
 
-def get_friendships_followers(ids, access_token, expires_in, count=200, cursor=0):
+
+def get_friendships_followers(uid, access_token, expires_in, count=200, cursor=0):
     """
-    批量获取转发评论数，新浪100个，腾讯30个， id之间用逗号隔开
+    获取用户的粉丝列表
     """
+    #TODO 未完成
     api = APIClient()
     api.set_access_token(access_token=access_token, expires=expires_in)
-    resp = api.get.friendships__followers(ids=ids)
+    resp = api.get.friendships__followers(uid=uid, count=200)
+    if api.is_expires():
+        error_message = '授权码过期，请重新授权！'
+        #TODO 重新授权
+        refresh_access_token()
+        return
     results = []
     users = resp.users
     for user in users:
         result = {
-            'id': data['id'],
-            'comments_count': data['comments'],
-            'reposts_count': data['reposts']
+            'id': users['id'],
+            'comments_count': users['comments'],
+            'reposts_count': users['reposts']
         }
         results.append(result)
     return results
+
 
 def friendships_create(uid, access_token, expires_in):
     api = APIClient()
     api.set_access_token(access_token=access_token, expires=expires_in)
     if api.is_expires():
+        error_message = '授权码过期，请重新授权！'
+        #TODO 重新授权
+        refresh_access_token()
         return
     api.post.friendships__create(uid=uid)
+
+
+def refresh_access_token(username, password):
+    weibologin.login(username, password)
+    access_token, expires_in = weibologin.getToken()
