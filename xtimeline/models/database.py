@@ -2,16 +2,15 @@
 # -*- coding: utf-8 -*-
 __author__ = 'Tony.Shao'
 
-from xtimeline.config import DB_CONNECT_STRING, DB_SQL_ECHO
+from xtimeline.config import POSTGERSQL_DB_CONNECT_STRING, DB_SQL_ECHO
 from xtimeline.helpers import when
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, Column
+from sqlalchemy import INTEGER, VARCHAR, DATETIME, BIGINT
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column
-from sqlalchemy.dialects.mysql import INTEGER, VARCHAR, DATETIME, BIGINT
 
 def createEngine():
-    engine = create_engine(DB_CONNECT_STRING, convert_unicode=True, pool_recycle=3600, echo=DB_SQL_ECHO)
+    engine = create_engine(POSTGERSQL_DB_CONNECT_STRING, convert_unicode=True, pool_recycle=3600, echo=DB_SQL_ECHO)
     return engine
 
 engine = createEngine()
@@ -32,3 +31,32 @@ class WeiboAccounts(Model):
     status = Column(INTEGER)
     created_at = Column(DATETIME, default=when.now)
     updated_at = Column(DATETIME, default=when.now, onupdate=when.now)
+
+
+class Statuses(Model):
+    __tablename__ = 'tb_weibo_statuses'
+    pass
+
+class Comments(Model):
+    __tablename__ = 'tb_weibo_comments'
+    pass
+
+class StatusesHistory(Model):
+    __tablename__ = 'tb_weibo_statuses_history'
+    pass
+
+class RepostTimelineIDs(Model):
+    __tablename__ = 'tb_weibo_retweeted_timeline_ids'
+    pass
+
+class Users(Model):
+    __tablename__ = 'tb_weibo_users'
+    pass
+
+class UsersHistory(Model):
+    __tablename__ = 'tb_weibo_users_history'
+    pass
+
+class Friendships(Model):
+    __tablename__ = 'tb_weibo_friendships'
+    pass
