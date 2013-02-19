@@ -18,10 +18,8 @@ session = requests.session()
 postdata = {
     'entry': 'weibo',
     'gateway': '1',
-    'from': '',
     'savestate': '7',
     'userticket': '1',
-    'ssosimplelogin': '1',
     'vsnf': '1',
     'su': '',
     'service': 'miniblog',
@@ -31,7 +29,7 @@ postdata = {
     'rsakv': '',
     'sp': '',
     'encoding': 'UTF-8',
-    'prelt': '134',
+    'pagerefer': '',
     'url': 'http://weibo.com/ajaxlogin.php?framelogin=1&callback=parent.sinaSSOController.feedBackUrlCallBack',
     'returntype': 'META'
 }
@@ -60,7 +58,6 @@ def __get_pwd(pwd):
     '''
     RSA加密
     '''
-    global session
     resp = session.get(RSA_SERVER_URL % pwd)
     return resp.content
 
@@ -75,27 +72,27 @@ def __get_user(username):
 
 
 def login(username, pwd):
-    global session
     url = 'http://login.sina.com.cn/sso/login.php?client=ssologin.js(v1.4.5)'
     try:
         servertime, nonce, rsakv = __get_servertime()
     except Exception, e:
         print e
         return None
-    global postdata
     postdata['servertime'] = servertime
     postdata['nonce'] = nonce
     postdata['su'] = __get_user(username)
     postdata['sp'] = __get_pwd(pwd)
     postdata['rsakv'] = rsakv
     headers = {
-        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.70 Safari/537.17'}
+        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.70 Safari/537.17'
+    }
 
     result = session.post(
         url=url,
         data=postdata,
         headers=headers,
     )
+
     result.encoding = 'GBK'
     text = result.text
     print text
