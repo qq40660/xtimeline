@@ -4,10 +4,12 @@
 import base64
 import re
 import json
-import requests
 import traceback
-from requests.compat import cookielib
 import time
+
+import requests
+from requests.compat import cookielib
+
 
 APP_KEY = 3231340587
 APP_SECRET = '94c4a0dc3c4a571b796ffddd09778cff'

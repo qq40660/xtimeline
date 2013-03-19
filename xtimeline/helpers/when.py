@@ -12,9 +12,11 @@ import calendar
 import datetime
 import locale
 import os
-import pytz
 import random
 import time
+
+import pytz
+
 
 # Some functions may take a parameter to designate a return value in UTC
 # instead of local time.  This will be used to force them to return UTC
@@ -44,8 +46,8 @@ class _FormatsMetaClass(type):
     def __contains__(self, value):
         index = 0
         for attr in dir(_FormatsMetaClass):
-            if not attr.startswith('__') and attr != 'mro' and\
-               getattr(_FormatsMetaClass, attr) == value:
+            if not attr.startswith('__') and attr != 'mro' and \
+                            getattr(_FormatsMetaClass, attr) == value:
                 index = attr
                 break
         return index
@@ -57,6 +59,7 @@ class _FormatsMetaClass(type):
         for attr in dir(_FormatsMetaClass):
             if not attr.startswith('__') and attr != 'mro':
                 yield attr
+
 
 formats = _FormatsMetaClass('formats', (object,), {})
 formats.__doc__ = """A set of predefined datetime formats.
@@ -72,9 +75,9 @@ def _add_time(value, years=0, months=0, weeks=0, days=0,
     # If any of the standard timedelta values are used, use timedelta for them.
     if seconds or minutes or hours or days or weeks:
         delta = datetime.timedelta(weeks=weeks, days=days, hours=hours,
-            minutes=minutes, seconds=seconds,
-            milliseconds=milliseconds,
-            microseconds=microseconds)
+                                   minutes=minutes, seconds=seconds,
+                                   milliseconds=milliseconds,
+                                   microseconds=microseconds)
         value += delta
 
     # Months are tricky. If the current month plus the requested number of
@@ -209,8 +212,8 @@ def ever():
     microsecond = random.randint(0, 1000000)
 
     return datetime.datetime(year=year, month=month, day=day, hour=hour,
-        minute=minute, second=second,
-        microsecond=microsecond)
+                             minute=minute, second=second,
+                             microsecond=microsecond)
 
 
 def format(value, format_string):
@@ -296,8 +299,8 @@ def future(years=0, months=0, weeks=0, days=0,
     .. versionadded:: 0.1.0
     """
     return _add_time(now(utc), years=years, months=months, weeks=weeks,
-        days=days, hours=hours, minutes=minutes, seconds=seconds,
-        milliseconds=milliseconds, microseconds=microseconds)
+                     days=days, hours=hours, minutes=minutes, seconds=seconds,
+                     milliseconds=milliseconds, microseconds=microseconds)
 
 
 def how_many_leap_days(from_date, to_date):
@@ -319,7 +322,7 @@ def how_many_leap_days(from_date, to_date):
     if isinstance(to_date, int):
         to_date = datetime.date(to_date, 1, 1)
 
-    assert _is_date_type(from_date) and\
+    assert _is_date_type(from_date) and \
            not isinstance(from_date, datetime.time)
     assert _is_date_type(to_date) and not isinstance(to_date, datetime.time)
 
@@ -396,7 +399,7 @@ def is_timezone_aware(value):
     .. versionadded:: 0.3.0
     """
     assert hasattr(value, 'tzinfo')
-    return value.tzinfo is not None and\
+    return value.tzinfo is not None and \
            value.tzinfo.utcoffset(value) is not None
 
 
@@ -472,9 +475,9 @@ def past(years=0, months=0, weeks=0, days=0,
     .. versionadded:: 0.1.0
     """
     return _add_time(now(utc), years=-years, months=-months, weeks=-weeks,
-        days=-days, hours=-hours, minutes=-minutes,
-        seconds=-seconds, milliseconds=milliseconds,
-        microseconds=microseconds)
+                     days=-days, hours=-hours, minutes=-minutes,
+                     seconds=-seconds, milliseconds=milliseconds,
+                     microseconds=microseconds)
 
 
 def set_utc():
@@ -606,7 +609,7 @@ def _timezone_from_etc_localtime():
     matches = []
     if os.path.exists('/etc/localtime'):
         localtime = pytz.tzfile.build_tzinfo('/etc/localtime',
-            file('/etc/localtime'))
+                                             file('/etc/localtime'))
 
         for tzname in pytz.all_timezones:
             tz = pytz.timezone(tzname)

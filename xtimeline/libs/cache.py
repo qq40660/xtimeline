@@ -12,6 +12,7 @@ import base64
 import hashlib
 import redis
 
+
 class RedisConnect(object):
     '''
     A simple object to store and pass database connection information.
@@ -36,7 +37,7 @@ class RedisConnect(object):
             raise RedisNoConnException, ("Failed to create connection to redis",
                                          (self.host,
                                           self.port)
-                )
+            )
         return redis.StrictRedis(host=self.host, port=self.port, db=self.db)
 
 
@@ -53,7 +54,6 @@ class RedisNoConnException(Exception):
 
 
 class SimpleCache(object):
-
     def __init__(self, limit=1000, expire=60 * 60 * 24,
                  hashkeys=False, host=None, port=None, db=None):
 
@@ -152,6 +152,7 @@ def cache_it(limit=1000, expire=60 * 60 * 24, cache=None):
     must be pickleable.
     """
     cache_ = cache  ## Since python 2.x doesn't have the nonlocal keyword, we need to do this
+
     def decorator(function):
         cache = cache_
         if cache is None:
@@ -181,7 +182,9 @@ def cache_it(limit=1000, expire=60 * 60 * 24, cache=None):
             result = function(*args)
             cache.store_pickle(cache_key, result)
             return result
+
         return func
+
     return decorator
 
 
@@ -191,6 +194,7 @@ def cache_it_json(limit=1000, expire=60 * 60 * 24, cache=None):
     in the database. Useful for types like list, tuple, dict, etc.
     """
     cache_ = cache  ## Since python 2.x doesn't have the nonlocal keyword, we need to do this
+
     def decorator(function):
         cache = cache_
         if cache is None:
@@ -220,7 +224,9 @@ def cache_it_json(limit=1000, expire=60 * 60 * 24, cache=None):
             result = function(*args)
             cache.store_json(cache_key, result)
             return result
+
         return func
+
     return decorator
 
 

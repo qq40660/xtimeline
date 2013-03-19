@@ -1,27 +1,27 @@
 #!/usr/bin python
 # -*- coding: utf-8 -*-
-from pymongo.errors import DuplicateKeyError
-from xtimeline.helpers import when
-from xtimeline.models.database import Statuses, Users, Friendships, RepostTimelineIDs
+from xtimeline.models.database import Statuses, Users
 
 __author__ = 'Tony.Shao'
 
-def store_status(status):
+
+def store_status(status, db=1):  # 0 mysql 1 psql 2 mongo
     if status is None:
         return
-    document = Statuses.collection.find_one(status['_id'])
+    document = Statuses.query.filter(Statuses.wid == status.wid).first()
     if document:
-        status = update_mongo_document(document=document, data=status)
+        status.id = document.id
+        status.counter += 1
     status = Statuses(**status)
     status.save()
 
 
-def store_user(user):
+def store_user(user, db=1):
     if user is None:
         return
-    document = Users.collection.find_one(user['_id'])
+    document = Users.query.filter(Users.uid == user.uid).first()
     if document:
-        user = update_mongo_document(document=document, data=user)
+        user.id = document.id
     user = Users(**user)
     user.save()
 
@@ -69,34 +69,4 @@ def store_timeline(timeline):
             store_status_history(retweeted_status) #保持微薄历史
             store_user_history(retweeted_status_user) #保持用户历史
     return len(timeline)
-
-
-def store_friendships(uid, follower_id):
-    user = Users.collection.find_one(uid)
-    if user:
-        followers = user.get('followers', [])
-        if not isinstance(followers, list) and not isinstance(followers, tuple):
-            followers = [followers]
-        followers.append(follower_id)
-        user.followers = followers
-        user.save()
-    friendship = Friendships(uid=uid, follower_id=follower_id, status=1, created_at=when.now())
-    friendship.save()
-
-
-def update_friendships_status(uid):
-    Friendships.collection.update({'uid': uid}, {'$set': {'status': 0}}, multi=True)
-
-
-def store_repost_timeline_ids(status_ids, retweeted_status_id):
-    for status_id in status_ids:
-        try:
-            repost_timeline_ids = RepostTimelineIDs(wid=status_id, retweeted_status_id=retweeted_status_id)
-            repost_timeline_ids.save()
-        except DuplicateKeyError as pe:
-            pass
-
-
-if __name__ == '__main__':
-    store_friendships(1, 1)
 

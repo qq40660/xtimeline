@@ -1,7 +1,7 @@
 #!/usr/bin python
 # -*- coding: utf-8 -*-
 
-__version__ = '1.0.9'
+__version__ = '1.1.1'
 __author__ = 'Liao Xuefeng (askxuefeng@gmail.com)'
 
 '''
@@ -11,7 +11,6 @@ Python client SDK for sina weibo API using OAuth 2.
 APP_KEY = '3231340587s'
 APP_SECRET = '702b4bcc6d56961f569943ecee1a76f4'
 CALLBACK_URL = ''
-
 try:
     import json
 except ImportError:
@@ -22,12 +21,22 @@ try:
 except ImportError:
     from StringIO import StringIO
 
-import gzip, time, hmac, base64, hashlib, urllib, urllib2, logging, mimetypes
+import gzip
+import time
+import hmac
+import base64
+import hashlib
+import urllib
+import urllib2
+import logging
+import mimetypes
+
 
 class APIError(StandardError):
-    '''
-    raise APIError if got failed json message.
-    '''
+    """
+    raise APIError if receiving json message indicating failure.
+    """
+
     def __init__(self, error_code, error, request):
         self.error_code = error_code
         self.error = error
@@ -37,8 +46,9 @@ class APIError(StandardError):
     def __str__(self):
         return 'APIError: %s: %s, request: %s' % (self.error_code, self.error, self.request)
 
+
 def _parse_json(s):
-    ' parse str to JsonDict '
+    """ parse str into JsonDict """
 
     def _obj_hook(pairs):
         ' convert json object to python object '
@@ -46,32 +56,34 @@ def _parse_json(s):
         for k, v in pairs.iteritems():
             o[str(k)] = v
         return o
+
     return json.loads(s, object_hook=_obj_hook)
 
+
 class JsonDict(dict):
-    ' general json object that can bind any fields but also act as a dict '
+    """ general json object that allows attributes to be bound to and also behaves like a dict """
+
     def __getattr__(self, attr):
-        return self[attr]
+        try:
+            return self[attr]
+        except KeyError:
+            raise AttributeError(r"'JsonDict' object has no attribute '%s'" % attr)
 
     def __setattr__(self, attr, value):
         self[attr] = value
 
-    def __getstate__(self):
-        return self.copy()
-
-    def __setstate__(self, state):
-        self.update(state)
 
 def _encode_params(**kw):
-    ' do url-encode parameters '
+    """ do url-encode parameters """
     args = []
     for k, v in kw.iteritems():
         qv = v.encode('utf-8') if isinstance(v, unicode) else str(v)
         args.append('%s=%s' % (k, urllib.quote(qv)))
     return '&'.join(args)
 
+
 def _encode_multipart(**kw):
-    ' build a multipart/form-data body with generated random boundary '
+    """ build a multipart/form-data body with randomly generated boundary """
     boundary = '----------%s' % hex(int(time.time() * 1000))
     data = []
     for k, v in kw.iteritems():
@@ -90,31 +102,37 @@ def _encode_multipart(**kw):
     data.append('--%s--\r\n' % boundary)
     return '\r\n'.join(data), boundary
 
+
 def _guess_content_type(url):
     n = url.rfind('.')
-    if n==(-1):
+    if n == (-1):
         return 'application/octet-stream'
     ext = url[n:]
     mimetypes.types_map.get(ext, 'application/octet-stream')
+
 
 _HTTP_GET = 0
 _HTTP_POST = 1
 _HTTP_UPLOAD = 2
 
+
 def _http_get(url, authorization=None, **kw):
     logging.info('GET %s' % url)
     return _http_call(url, _HTTP_GET, authorization, **kw)
+
 
 def _http_post(url, authorization=None, **kw):
     logging.info('POST %s' % url)
     return _http_call(url, _HTTP_POST, authorization, **kw)
 
+
 def _http_upload(url, authorization=None, **kw):
     logging.info('MULTIPART POST %s' % url)
     return _http_call(url, _HTTP_UPLOAD, authorization, **kw)
 
+
 def _read_body(obj):
-    using_gzip = obj.headers.get('Content-Encoding', '')=='gzip'
+    using_gzip = obj.headers.get('Content-Encoding', '') == 'gzip'
     body = obj.read()
     if using_gzip:
         logging.info('gzip content received.')
@@ -124,13 +142,14 @@ def _read_body(obj):
         return fcontent
     return body
 
+
 def _http_call(the_url, method, authorization, **kw):
-    '''
-    send an http request and expect to return a json object if no error.
-    '''
+    """
+    send an http request and return a json object if no error occurred.
+    """
     params = None
     boundary = None
-    if method==_HTTP_UPLOAD:
+    if method == _HTTP_UPLOAD:
         # fix sina upload url:
         the_url = the_url.replace('https://api.', 'https://upload.api.')
         params, boundary = _encode_multipart(**kw)
@@ -139,8 +158,8 @@ def _http_call(the_url, method, authorization, **kw):
         if '/remind/' in the_url:
             # fix sina remind api:
             the_url = the_url.replace('https://api.', 'https://rm.api.')
-    http_url = '%s?%s' % (the_url, params) if method==_HTTP_GET else the_url
-    http_body = None if method==_HTTP_GET else params
+    http_url = '%s?%s' % (the_url, params) if method == _HTTP_GET else the_url
+    http_body = None if method == _HTTP_GET else params
     req = urllib2.Request(http_url, data=http_body)
     req.add_header('Accept-Encoding', 'gzip')
     if authorization:
@@ -163,8 +182,8 @@ def _http_call(the_url, method, authorization, **kw):
             raise APIError(r.error_code, r.get('error', ''), r.get('request', ''))
         raise e
 
-class HttpObject(object):
 
+class HttpObject(object):
     def __init__(self, client, method):
         self.client = client
         self.method = method
@@ -173,14 +192,20 @@ class HttpObject(object):
         def wrap(**kw):
             if self.client.is_expires():
                 raise APIError('21327', 'expired_token', attr)
-            return _http_call('%s%s.json' % (self.client.api_url, attr.replace('__', '/')), self.method, self.client.access_token, **kw)
+            return _http_call('%s%s.json' % (self.client.api_url, attr.replace('__', '/')), self.method,
+                              self.client.access_token, **kw)
+
         return wrap
 
+
 class APIClient(object):
-    '''
+    """
     API client using synchronized invocation.
-    '''
-    def __init__(self, app_key=APP_KEY, app_secret=APP_SECRET, redirect_uri=CALLBACK_URL, response_type='code', domain='api.weibo.com', version='2'):
+    """
+
+    def __init__(self, app_key=APP_KEY, app_secret=APP_SECRET, redirect_uri=CALLBACK_URL, response_type='code',
+                 domain='api.weibo.com',
+                 version='2'):
         self.client_id = str(app_key)
         self.client_secret = str(app_secret)
         self.redirect_uri = redirect_uri
@@ -194,13 +219,13 @@ class APIClient(object):
         self.upload = HttpObject(self, _HTTP_UPLOAD)
 
     def parse_signed_request(self, signed_request):
-        '''
+        """
         parse signed request when using in-site app.
 
         Returns:
-            dict object that like { 'uid': 12345, 'access_token': 'ABC123XYZ', 'expires': unix-timestamp },
+            dict object like { 'uid': 12345, 'access_token': 'ABC123XYZ', 'expires': unix-timestamp },
             or None if parse failed.
-        '''
+        """
 
         def _b64_normalize(s):
             appendix = '=' * (4 - len(s) % 4)
@@ -214,7 +239,7 @@ class APIClient(object):
         if data['algorithm'] != u'HMAC-SHA256':
             return None
         expected_sig = hmac.new(self.client_secret, enc_payload, hashlib.sha256).digest();
-        if expected_sig==sig:
+        if expected_sig == sig:
             data.user_id = data.uid = data.get('user_id', None)
             data.access_token = data.get('oauth_token', None)
             expires = data.get('expires', None)
@@ -228,30 +253,30 @@ class APIClient(object):
         self.expires = float(expires)
 
     def get_authorize_url(self, redirect_uri=None, **kw):
-        '''
-        return the authroize url that should be redirect.
-        '''
+        """
+        return the authorization url that the user should be redirected to.
+        """
         redirect = redirect_uri if redirect_uri else self.redirect_uri
         if not redirect:
             raise APIError('21305', 'Parameter absent: redirect_uri', 'OAuth2 request')
         response_type = kw.pop('response_type', 'code')
-        return '%s%s?%s' % (self.auth_url, 'authorize',\
-                            _encode_params(client_id = self.client_id,\
-                                response_type = response_type,\
-                                redirect_uri = redirect, **kw))
+        return '%s%s?%s' % (self.auth_url, 'authorize', \
+                            _encode_params(client_id=self.client_id, \
+                                           response_type=response_type, \
+                                           redirect_uri=redirect, **kw))
 
     def request_access_token(self, code, redirect_uri=None):
-        '''
-        return access token as object: {"access_token":"your-access-token","expires_in":12345678,"uid":1234}, expires_in is standard unix-epoch-time
-        '''
+        """
+        return access token as a JsonDict: {\"access_token\":\"your-access-token\",\"expires_in\":12345678,\"uid\":1234}, expires_in is represented using standard unix-epoch-time
+        """
         redirect = redirect_uri if redirect_uri else self.redirect_uri
         if not redirect:
             raise APIError('21305', 'Parameter absent: redirect_uri', 'OAuth2 request')
-        r = _http_post('%s%s' % (self.auth_url, 'access_token'),\
-            client_id = self.client_id,\
-            client_secret = self.client_secret,\
-            redirect_uri = redirect,\
-            code = code, grant_type = 'authorization_code')
+        r = _http_post('%s%s' % (self.auth_url, 'access_token'), \
+                       client_id=self.client_id, \
+                       client_secret=self.client_secret, \
+                       redirect_uri=redirect, \
+                       code=code, grant_type='authorization_code')
         current = int(time.time())
         expires = r.expires_in + current
         remind_in = r.get('remind_in', None)
@@ -269,10 +294,11 @@ class APIClient(object):
             return getattr(self.get, attr)
         return _Callable(self, attr)
 
-_METHOD_MAP = { 'GET': _HTTP_GET, 'POST': _HTTP_POST, 'UPLOAD': _HTTP_UPLOAD }
+
+_METHOD_MAP = {'GET': _HTTP_GET, 'POST': _HTTP_POST, 'UPLOAD': _HTTP_UPLOAD}
+
 
 class _Executable(object):
-
     def __init__(self, client, method, path):
         self._client = client
         self._method = method
@@ -280,7 +306,7 @@ class _Executable(object):
 
     def __call__(self, **kw):
         method = _METHOD_MAP[self._method]
-        if method==_HTTP_POST and 'pic' in kw:
+        if method == _HTTP_POST and 'pic' in kw:
             method = _HTTP_UPLOAD
         return _http_call('%s%s.json' % (self._client.api_url, self._path), method, self._client.access_token, **kw)
 
@@ -289,16 +315,16 @@ class _Executable(object):
 
     __repr__ = __str__
 
-class _Callable(object):
 
+class _Callable(object):
     def __init__(self, client, name):
         self._client = client
         self._name = name
 
     def __getattr__(self, attr):
-        if attr=='get':
+        if attr == 'get':
             return _Executable(self._client, 'GET', self._name)
-        if attr=='post':
+        if attr == 'post':
             return _Executable(self._client, 'POST', self._name)
         name = '%s/%s' % (self._name, attr)
         return _Callable(self._client, name)

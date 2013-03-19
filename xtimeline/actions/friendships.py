@@ -15,13 +15,16 @@ import time
 import traceback
 import random
 
+
 def creator():
-    weibo_accounts = WeiboAccounts.query.filter(WeiboAccounts.status == 1, WeiboAccounts.expires_in > int(time.time())).all()
+    weibo_accounts = WeiboAccounts.query.filter(WeiboAccounts.status == 1,
+                                                WeiboAccounts.expires_in > int(time.time())).all()
     for account in weibo_accounts:
         uid = 0
         try:
             users = Users.collection.find({'$or': [{'friends_count': {'$gt': 5000}},
-                                                   {'verified': True, 'friends_count': {'$gt': 2000}}], 'followers': {'$exists': False}}).limit(5)
+                                                   {'verified': True, 'friends_count': {'$gt': 2000}}],
+                                           'followers': {'$exists': False}}).limit(5)
             for user in users:
                 uid = user.id
                 print uid
@@ -45,10 +48,12 @@ def creator():
             print '[CURRENT_TIME: %s]' % when.now()
             time.sleep(60 * random.randint(1, 10))
 
+
 def start():
     while True:
         creator()
         time.sleep(60 * 10)
+
 
 if __name__ == '__main__':
     start()

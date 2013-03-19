@@ -5,7 +5,7 @@ import traceback
 from xtimeline.helpers.statuses import sina_homeline_parser
 
 from xtimeline.libs.weibo import APIClient
-from xtimeline.helpers import weibologin
+# from xtimeline.helpers import weibologin
 
 
 def get_home_timeline(access_token, expires_in, since_id=0, max_id=0, count=100):
@@ -36,7 +36,7 @@ def get_home_timeline(access_token, expires_in, since_id=0, max_id=0, count=100)
 
 def get_statuses_counts(ids, access_token, expires_in):
     """
-    批量获取转发评论数，新浪100个，腾讯30个， id之间用逗号隔开
+    批量获取转发评论数，新浪100个，id之间用逗号隔开
     """
     api = APIClient()
     api.set_access_token(access_token=access_token, expires=expires_in)
@@ -93,6 +93,8 @@ def friendships_create(uid, access_token, expires_in):
     api.post.friendships__create(uid=uid)
 
 
-def refresh_access_token(username, password):
-    weibologin.login(username, password)
-    access_token, expires_in = weibologin.getToken()
+def refresh_access_token():
+    #TODO complete
+    # weibologin.login(username, password)
+    # access_token, expires_in = weibologin.getToken()
+    pass

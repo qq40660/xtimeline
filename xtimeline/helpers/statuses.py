@@ -6,7 +6,6 @@ import timelib
 from xtimeline.helpers import when, base62
 
 
-
 def sina_comments_parser(status):
     _status = dict()
     _status['id'] = status.id
@@ -86,7 +85,7 @@ def sina_homeline_parser(statuses):
         _user = sina_user_parser(user)
         if _user:
             _status['user'] = _user
-            _status['uid'] = _user['id']
+            _status['uid'] = _user['uid']
         _status['is_retweet'] = 0
         _status['retweeted_status_id'] = 0
         retweeted_status = status.get('retweeted_status', None)
@@ -98,10 +97,10 @@ def sina_homeline_parser(statuses):
                 retweeted_status_user = retweeted_status.get('user', None)
                 _retweeted_status_user = sina_user_parser(retweeted_status_user)
                 _retweeted_status['user'] = _retweeted_status_user
-                _retweeted_status['uid'] = _retweeted_status_user['id']
+                _retweeted_status['uid'] = _retweeted_status_user['uid']
             _retweeted_status['retweeted_status_id'] = 0
             _retweeted_status['is_retweet'] = 0
-            _status['retweeted_status_id'] = _retweeted_status['id']
+            _status['retweeted_status_id'] = _retweeted_status['wid']
             _status['is_retweet'] = 1
             _statuses.append(_retweeted_status)
         _statuses.append(_status)
@@ -113,14 +112,10 @@ def sina_status_parser(status):
         return
     _status = dict()
     if status.get('deleted', None):
-        _status['mid'] = status['mid']
-        _status['id'] = status['id']
-        _status['_id'] = long(status['id'])
+        _status['wid'] = status['id']
         _status['deleted'] = 1
     else:
-        _status['mid'] = status['mid']
-        _status['id'] = status['id']
-        _status['_id'] = long(status['id'])
+        _status['wid'] = status['id']
         _status['text'] = status['text']
         _status['created_at'] = int(when.parse2Timestamp(timelib.strtodatetime(status['created_at'])))
         _status['url'] = 'http://weibo.com/' + str(status['user']['id']) + '/' + base62.get_url(status['mid'])
@@ -130,13 +125,13 @@ def sina_status_parser(status):
         _status['comments_count'] = status.get('comments_count', 0)
     return _status
 
+
 def sina_user_parser(user):
     if user is None:
         return
     if user:
         status_user = {
-            "_id": user['id'],
-            "id": user['id'],
+            "uid": user['id'],
             "screen_name": user['screen_name'],
             "name": user['name'],
             "province": user['province'],

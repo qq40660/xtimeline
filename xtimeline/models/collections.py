@@ -2,8 +2,10 @@
 # -*- coding: utf-8 -*-
 __author__ = 'Tony.Shao'
 
-from xtimeline.config import MONGODB_HOST, MONGODB_PORT, MONGO_DB
 from minimongo import Model, Index
+
+from xtimeline.config import MONGODB_HOST, MONGODB_PORT, MONGO_DB
+
 
 class Statuses(Model):
     class Meta:
@@ -18,7 +20,7 @@ class Statuses(Model):
             Index("created_at"),
             Index("reposts_count"),
             Index("comments_count")
-            )
+        )
 
 
 class Comments(Model):
@@ -31,7 +33,7 @@ class Comments(Model):
             Index("_id"),
             Index("commented_status_id"),
             Index("created_at")
-            )
+        )
 
 
 class StatusesHistory(Model):
@@ -45,7 +47,7 @@ class StatusesHistory(Model):
             Index("created_at"),
             Index("reposts_count"),
             Index("comments_count")
-            )
+        )
 
 
 class RepostTimelineIDs(Model):
@@ -60,7 +62,7 @@ class RepostTimelineIDs(Model):
             Index("reposts_count"),
             Index("comments_count"),
             Index("created_at")
-            )
+        )
 
 
 class Users(Model):
@@ -75,7 +77,7 @@ class Users(Model):
             Index("verified_type"),
             Index("friends_count"),
             Index("followers_count")
-            )
+        )
 
 
 class UsersHistory(Model):
@@ -88,7 +90,8 @@ class UsersHistory(Model):
             Index("id"),
             Index("friends_count"),
             Index("followers_count")
-            )
+        )
+
 
 class Friendships(Model):
     class Meta:
@@ -101,4 +104,4 @@ class Friendships(Model):
             Index([("uid", 1), ('follower_id', 1)], unique=True),
             Index("follower_id"),
             Index("status")
-            )
+        )

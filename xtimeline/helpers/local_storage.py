@@ -6,6 +6,7 @@ from xtimeline.models.database import Statuses, Users, Friendships, RepostTimeli
 
 __author__ = 'Tony.Shao'
 
+
 def store_status(status):
     if status is None:
         return
