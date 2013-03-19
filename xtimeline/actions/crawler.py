@@ -24,10 +24,10 @@ def crawler():
             statuses = get_home_timeline(access_token=account.access_token, expires_in=account.expires_in)
             counts = store_timeline(statuses)
             print counts
-            sys.stdout.flush()
         except Exception:
             print traceback.format_exc()
         finally:
+            sys.stdout.flush()
             time.sleep(1 * random.randint(1, 10))
 
 
