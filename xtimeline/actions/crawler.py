@@ -1,5 +1,7 @@
 #!/usr/bin python
 # -*- coding: utf-8 -*-
+import sys
+
 __author__ = 'Tony.Shao'
 
 from xtimeline.models.database import WeiboAccounts
@@ -22,6 +24,7 @@ def crawler():
             statuses = get_home_timeline(access_token=account.access_token, expires_in=account.expires_in)
             counts = store_timeline(statuses)
             print counts
+            sys.stdout.flush()
         except Exception:
             print traceback.format_exc()
         finally:

@@ -1,11 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import os
+
 __author__ = 'Tony.Shao'
+import sys
+
+reload(sys)
+sys.setdefaultencoding('utf-8')
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+
 from multiprocessing import Process
 
 from xtimeline.actions.crawler import start as status_crawler
 from xtimeline.actions.friendships import start as friendship_creator
-from xtimeline.actions.publisher import start as status_poster
 
 
 if __name__ == '__main__':

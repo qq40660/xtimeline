@@ -1,5 +1,7 @@
 #!/usr/bin python
 # -*- coding: utf-8 -*-
+import sys
+
 __author__ = 'Tony.Shao'
 
 from xtimeline.models.database import WeiboAccounts
@@ -40,6 +42,7 @@ def creator():
             finally:
                 print '[CURRENT_TIME: %s]' % when.now()
                 time.sleep(random.randint(10, 60))
+                sys.stdout.flush()
 
 
 def start():
