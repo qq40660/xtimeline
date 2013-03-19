@@ -20,7 +20,7 @@ if __name__ == '__main__':
     creator_process = Process(target=friendship_creator)
     # #poster_process = Process(target=status_poster)
     crawler_process.start()
-    # creator_process.start()
+    creator_process.start()
     #poster_process.start()
 
 
