@@ -32,6 +32,7 @@ class WeiboAccounts(Model):
     access_token = Column(VARCHAR(255))
     expires_in = Column(INTEGER)
     status = Column(INTEGER)
+    friends_count = Column(INTEGER)
     created_at = Column(DATETIME, default=when.now)
     updated_at = Column(DATETIME, default=when.now, onupdate=when.now)
 
@@ -44,27 +45,12 @@ class Statuses(Model):
     uid = Column(BIGINT)
     retweeted_status_id = Column(BIGINT)
     text = Column(TEXT)
-    source = Column(VARCHAR(255))
     original_pic = Column(VARCHAR(255))
+    url = Column(VARCHAR(255))
     reposts_count = Column(INTEGER)
     comments_count = Column(INTEGER)
-    counter = Column(INTEGER)  # counter
+    counter = Column(INTEGER, default=1)  # counter
     created_at = Column(DATETIME, default=when.now)
-
-
-class Comments(Model):
-    __tablename__ = 'tb_weibo_comments'
-    pass
-
-
-class StatusesHistory(Model):
-    __tablename__ = 'tb_weibo_statuses_history'
-    pass
-
-
-class RepostTimelineIDs(Model):
-    __tablename__ = 'tb_weibo_retweeted_timeline_ids'
-    pass
 
 
 class Users(Model):
@@ -81,14 +67,6 @@ class Users(Model):
     verified_type = Column(INTEGER)
     verified_reason = Column(VARCHAR(255))
     gender = Column(INTEGER)
+    follower = Column(BIGINT, default=0)
     created_at = Column(DATETIME, default=when.now)
 
-
-class UsersHistory(Model):
-    __tablename__ = 'tb_weibo_users_history'
-    pass
-
-
-class Friendships(Model):
-    __tablename__ = 'tb_weibo_friendships'
-    pass

@@ -89,7 +89,7 @@ def friendships_create(uid, access_token, expires_in):
         error_message = '授权码过期，请重新授权！'
         #TODO 重新授权
         refresh_access_token()
-        return
+        return False
     api.post.friendships__create(uid=uid)
 
 

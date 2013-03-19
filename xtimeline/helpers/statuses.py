@@ -86,7 +86,6 @@ def sina_homeline_parser(statuses):
         if _user:
             _status['user'] = _user
             _status['uid'] = _user['uid']
-        _status['is_retweet'] = 0
         _status['retweeted_status_id'] = 0
         retweeted_status = status.get('retweeted_status', None)
         if retweeted_status:
@@ -99,9 +98,7 @@ def sina_homeline_parser(statuses):
                 _retweeted_status['user'] = _retweeted_status_user
                 _retweeted_status['uid'] = _retweeted_status_user['uid']
             _retweeted_status['retweeted_status_id'] = 0
-            _retweeted_status['is_retweet'] = 0
             _status['retweeted_status_id'] = _retweeted_status['wid']
-            _status['is_retweet'] = 1
             _statuses.append(_retweeted_status)
         _statuses.append(_status)
     return _statuses
@@ -117,10 +114,9 @@ def sina_status_parser(status):
     else:
         _status['wid'] = status['id']
         _status['text'] = status['text']
-        _status['created_at'] = int(when.parse2Timestamp(timelib.strtodatetime(status['created_at'])))
+        _status['created_at'] = timelib.strtodatetime(status['created_at'])
         _status['url'] = 'http://weibo.com/' + str(status['user']['id']) + '/' + base62.get_url(status['mid'])
-        _status['thumbnail_pic'] = status.get('thumbnail_pic', '')
-        _status['bmiddle_pic'] = status.get('bmiddle_pic', '')
+        _status['original_pic'] = status.get('original_pic', '')
         _status['reposts_count'] = status.get('reposts_count', 0)
         _status['comments_count'] = status.get('comments_count', 0)
     return _status
@@ -133,24 +129,14 @@ def sina_user_parser(user):
         status_user = {
             "uid": user['id'],
             "screen_name": user['screen_name'],
-            "name": user['name'],
-            "province": user['province'],
-            "city": user['city'],
-            "location": user['location'],
-            "description": user['description'],
-            "url": user['url'],
-            "profile_image_url": user['profile_image_url'],
-            "domain": user['domain'],
-            "gender": user['gender'],
+            "profile_image_url": user.get('profile_image_url', ''),
             "followers_count": user['followers_count'],
             "friends_count": user['friends_count'],
             "statuses_count": user['statuses_count'],
-            "favourites_count": user['favourites_count'],
             "created_at": timelib.strtodatetime(user['created_at']),
-            "verified": user['verified'],
-            "verified_type": user['verified_type'],
-            "avatar_large": user['avatar_large'],
-            "verified_reason": user['verified_reason'],
-            "bi_followers_count": user['bi_followers_count']
+            "verified": 1 if user.get('verified', 0) else 0,
+            "verified_type": user.get('verified_type', 0),
+            "gender": 1 if user.get('gender', 'm') == 'm' else 0,
+            "verified_reason": user.get('verified_reason', '')
         }
         return status_user
