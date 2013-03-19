@@ -33,8 +33,12 @@ def crawler():
 
 def start():
     while True:
-        crawler()
-        time.sleep(60)
+        try:
+            crawler()
+        except Exception:
+            print traceback.format_exc()
+        finally:
+            time.sleep(60)
 
 
 if __name__ == '__main__':
