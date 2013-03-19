@@ -22,6 +22,6 @@ if __name__ == '__main__':
     # crawler_process.start()
     # creator_process.start()
     #poster_process.start()
-    status_crawler()
+    friendship_creator()
 
 
