@@ -47,8 +47,8 @@ def start():
         except Exception:
             print traceback.format_exc()
         finally:
-            time.sleep(10 * 60)
             sys.stdout.flush()
+            time.sleep(10 * 60)
 
 
 if __name__ == '__main__':
