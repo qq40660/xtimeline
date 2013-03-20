@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import time
 import traceback
+import sys
 
 __author__ = 'Tony.Shao'
 
@@ -47,6 +48,7 @@ def start():
             print traceback.format_exc()
         finally:
             time.sleep(10 * 60)
+            sys.stdout.flush()
 
 
 if __name__ == '__main__':
