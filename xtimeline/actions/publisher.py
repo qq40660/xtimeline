@@ -18,12 +18,14 @@ cache = SimpleCache(limit=100, set_name='xtimeline')
 def __get_top():
     statuses = Statuses.query.filter(Statuses.reposts_count > 100, Statuses.comments_count > 10, Statuses.counter > 5,
                                      Statuses.created_at >= when.past(hours=2)).all()
+    scored_statuses = []
     for status in statuses:
         if cache.exists(status.wid):
             continue
         score = scores(comments_count=status.comments_count, reposts_count=status.reposts_count, counter=status.counter)
         status.score = score
-    statuses = sorted(statuses, key=lambda status: status.score, reverse=True)
+        scored_statuses.append(status)
+    statuses = sorted(statuses, key=lambda scored_statuses: status.score, reverse=True)
     if statuses:
         return statuses[0]
 
