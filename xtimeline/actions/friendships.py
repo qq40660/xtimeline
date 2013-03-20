@@ -29,8 +29,9 @@ def creator():
                 print account.uid, user.uid
             except APIError as e:
                 #TODO User not exist
-                # if e.error_code in [10013, 20003]:
-                #     pass
+                if e.error_code in [10013, 20003]:
+                    store_friendships(uid=account.uid, target_id=user.uid)
+                    print account.uid, user.uid
                 if e.error_code in [20506]:
                     if user.uid:
                         store_friendships(uid=account.uid, target_id=user.uid)
