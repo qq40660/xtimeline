@@ -42,7 +42,7 @@ class RedisNoConnException(Exception):
 
 
 class SimpleCache(object):
-    def __init__(self, limit=1000, expire=60 * 60 * 3, set_name=None,
+    def __init__(self, limit=1000, expire=60 * 60 * 2, set_name=None,
                  hashkeys=False, host=None, port=None, db=None):
 
         self.limit = limit  # No of json encoded strings to cache
