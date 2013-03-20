@@ -120,7 +120,7 @@ class SimpleCache(object):
             if val is None:  # expired key
                 self.connection.srem(self.get_set_name(), key)
                 return False
-        return self.connection.sismember(key)
+        return self.connection.sismember(self.get_set_name(), key)
 
     def get_json(self, key):
         return json.loads(self.get(key))
