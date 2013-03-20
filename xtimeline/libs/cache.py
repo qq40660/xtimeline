@@ -42,7 +42,7 @@ class RedisNoConnException(Exception):
 
 
 class SimpleCache(object):
-    def __init__(self, limit=1000, expire=60 * 60 * 2,
+    def __init__(self, limit=100, expire=60 * 60 * 2, set_name=None,
                  hashkeys=False, host=None, port=None, db=None):
 
         self.limit = limit  # No of json encoded strings to cache
@@ -57,6 +57,7 @@ class SimpleCache(object):
         self.host = host
         self.port = port
         self.db = db
+        self.set_name = set_name
 
         ## We cannot assume that connection will always succeed. A try/except
         ## clause will assure unexpected behavior and an unhandled exception do not result.
@@ -74,6 +75,8 @@ class SimpleCache(object):
         return "SimpleCache-%s::%s" % (id(self), key)
 
     def get_set_name(self):
+        if self.set_name:
+            return "SimpleCache-%s-keys" % self.set_name
         return "SimpleCache-%s-keys" % id(self)
 
     def store(self, key, value, expire=None):
@@ -111,7 +114,7 @@ class SimpleCache(object):
         raise CacheMissException
 
     def exists(self, key):
-        return self.connection.sismember(self.get_set_name(), key)
+        return True if self.connection.get(self.make_key(key)) else False
 
     def get_json(self, key):
         return json.loads(self.get(key))
