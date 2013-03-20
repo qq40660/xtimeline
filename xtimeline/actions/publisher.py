@@ -36,6 +36,7 @@ def publish():
                     access_token=weibo_account.access_token,
                     expires_in=weibo_account.expires_in)
     cache.store(status.wid, status.score)
+    print status.wid
 
 
 def start():
