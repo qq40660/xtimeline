@@ -1,6 +1,7 @@
 #!/usr/bin python
 # -*- coding: utf-8 -*-
 import time
+import traceback
 
 __author__ = 'Tony.Shao'
 
@@ -39,8 +40,12 @@ def publish():
 
 def start():
     while True:
-        publish()
-        time.sleep(10 * 60)
+        try:
+            publish()
+        except Exception:
+            print traceback.format_exc()
+        finally:
+            time.sleep(10 * 60)
 
 
 if __name__ == '__main__':
