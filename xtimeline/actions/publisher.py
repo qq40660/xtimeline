@@ -32,7 +32,7 @@ def publish():
     status = __get_top()
     if status is None:
         return
-    statuses_repost(wid=status.wid, status="#实时热点推荐# 热度: " + str(round(status.score, 4) * 10) + " °",
+    statuses_repost(wid=status.wid, status="#实时热点推荐# 热度: " + str(round(status.score, 4) * 10) + "°",
                     access_token=weibo_account.access_token,
                     expires_in=weibo_account.expires_in)
     cache.store(status.wid, status.score)
