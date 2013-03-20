@@ -93,6 +93,17 @@ def friendships_create(uid, access_token, expires_in):
     api.post.friendships__create(uid=uid)
 
 
+def statuses_repost(wid, status, access_token, expires_in):
+    api = APIClient()
+    api.set_access_token(access_token=access_token, expires=expires_in)
+    if api.is_expires():
+        error_message = '授权码过期，请重新授权！'
+        #TODO 重新授权
+        refresh_access_token()
+        return False
+    api.post.statuses__repost(id=wid, status=status)
+
+
 def refresh_access_token():
     #TODO complete
     # weibologin.login(username, password)

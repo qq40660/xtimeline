@@ -14,30 +14,18 @@ import redis
 
 
 class RedisConnect(object):
-    '''
-    A simple object to store and pass database connection information.
-    This makes the Simple Cache class a little more flexible, for cases
-    where redis connection configuration needs customizing.
-    '''
-
     def __init__(self, host=None, port=None, db=None):
         self.host = host if host else 'localhost'
         self.port = port if port else 6379
         self.db = db if db else 0
 
     def connect(self):
-        '''
-        We cannot assume that connection will succeed, as such we use a ping()
-        method in the redis client library to validate ability to contact redis.
-        RedisNoConnException is raised if we fail to ping.
-        '''
         try:
             redis.StrictRedis(host=self.host, port=self.port).ping()
-        except redis.ConnectionError as e:
-            raise RedisNoConnException, ("Failed to create connection to redis",
-                                         (self.host,
-                                          self.port)
-            )
+        except redis.ConnectionError:
+            raise RedisNoConnException("Failed to create connection to redis",
+                                       (self.host,
+                                        self.port))
         return redis.StrictRedis(host=self.host, port=self.port, db=self.db)
 
 
@@ -54,7 +42,7 @@ class RedisNoConnException(Exception):
 
 
 class SimpleCache(object):
-    def __init__(self, limit=1000, expire=60 * 60 * 24,
+    def __init__(self, limit=1000, expire=60 * 60 * 2,
                  hashkeys=False, host=None, port=None, db=None):
 
         self.limit = limit  # No of json encoded strings to cache
@@ -74,7 +62,7 @@ class SimpleCache(object):
         ## clause will assure unexpected behavior and an unhandled exception do not result.
         try:
             self.connection = RedisConnect(host=self.host, port=self.port, db=0).connect()
-        except RedisNoConnException, e:
+        except RedisNoConnException:
             self.connection = None
             pass
 
@@ -121,6 +109,9 @@ class SimpleCache(object):
             else:
                 return val
         raise CacheMissException
+
+    def exists(self, key):
+        return self.connection.sismember(self.get_set_name(), self.make_key(key))
 
     def get_json(self, key):
         return json.loads(self.get(key))

@@ -3,7 +3,7 @@
 __author__ = 'Tony.Shao'
 
 MYSQL_DB_CONNECT_STRING = 'mysql+mysqldb://root:299792458@localhost/weibo?charset=utf8'
-POSTGERSQL_DB_CONNECT_STRING = 'postgresql+psycopg2://xio:299792458@localhost/xtimeline'
+POSTGERSQL_DB_CONNECT_STRING = 'postgresql+psycopg2://xio:299792458@www.xtimes.me/xtimeline'
 DB_SQL_ECHO = False
 
 MONGODB_HOST='localhost'

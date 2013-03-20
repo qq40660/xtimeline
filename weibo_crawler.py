@@ -13,14 +13,15 @@ from multiprocessing import Process
 
 from xtimeline.actions.crawler import start as status_crawler
 from xtimeline.actions.friendships import start as friendship_creator
+from xtimeline.actions.publisher import start as status_creator
 
 
 if __name__ == '__main__':
     crawler_process = Process(target=status_crawler)
-    creator_process = Process(target=friendship_creator)
-    # #poster_process = Process(target=status_poster)
+    friendship_process = Process(target=friendship_creator)
+    status_process = Process(target=status_creator)
     crawler_process.start()
-    creator_process.start()
-    #poster_process.start()
+    friendship_process.start()
+    status_process.start()
 
 
