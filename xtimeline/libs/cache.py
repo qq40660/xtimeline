@@ -111,7 +111,7 @@ class SimpleCache(object):
         raise CacheMissException
 
     def exists(self, key):
-        return self.connection.sismember(self.get_set_name(), self.make_key(key))
+        return self.connection.sismember(self.get_set_name(), key)
 
     def get_json(self, key):
         return json.loads(self.get(key))
