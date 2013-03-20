@@ -72,6 +72,8 @@ class SimpleCache(object):
         self.hashkeys = hashkeys
 
     def make_key(self, key):
+        if self.set_name:
+            return "SimpleCache-%s::%s" % (self.set_name, key)
         return "SimpleCache-%s::%s" % (id(self), key)
 
     def get_set_name(self):
