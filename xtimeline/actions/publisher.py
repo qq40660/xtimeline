@@ -11,7 +11,7 @@ from xtimeline.models.database import Statuses, WeiboAccounts
 from xtimeline.libs.cache import SimpleCache
 from xtimeline.helpers.weibo import statuses_repost
 
-cache = SimpleCache(set_name='xtimeline')
+cache = SimpleCache(limit=100, set_name='xtimeline')
 
 
 def __get_top():
