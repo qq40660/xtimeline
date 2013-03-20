@@ -114,7 +114,13 @@ class SimpleCache(object):
         raise CacheMissException
 
     def exists(self, key):
-        return True if self.connection.get(self.make_key(key)) else False
+        key = to_unicode(key)
+        if key in self:
+            val = self.connection.get(self.make_key(key))
+            if val is None:  # expired key
+                self.connection.srem(self.get_set_name(), key)
+                return False
+        return self.connection.sismember(key)
 
     def get_json(self, key):
         return json.loads(self.get(key))
