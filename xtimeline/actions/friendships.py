@@ -20,7 +20,7 @@ def creator():
     weibo_accounts = WeiboAccounts.query.filter(WeiboAccounts.status == 1, WeiboAccounts.friends_count < 1800,
                                                 WeiboAccounts.expires_in > int(time.time())).all()
     for account in weibo_accounts:
-        users = Users.query.filter(Users.followers_count >= 5000, Users.follower == 0).limit(5)
+        users = Users.query.filter(Users.followers_count >= 5000, Users.follower == 0).limit(3)
         for user in users:
             try:
                 friendships_create(uid=user.uid, access_token=account.access_token, expires_in=account.expires_in)
@@ -38,18 +38,19 @@ def creator():
                         update_followers_count(uid=account.uid)
                         print account.uid, user.uid
                 print traceback.format_exc()
+                break
             except Exception as e:
                 print traceback.format_exc()
             finally:
                 print '[CURRENT_TIME: %s]' % when.now()
-                time.sleep(random.randint(10, 60))
+                time.sleep(random.randint(60, 360))
                 sys.stdout.flush()
 
 
 def start():
     while True:
         creator()
-        time.sleep(60 * 10)
+        time.sleep(60 * 60)
 
 
 if __name__ == '__main__':
