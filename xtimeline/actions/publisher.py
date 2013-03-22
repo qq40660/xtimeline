@@ -50,7 +50,7 @@ def start():
             print traceback.format_exc()
         finally:
             sys.stdout.flush()
-            time.sleep(20 * 60)
+            time.sleep(10 * 60)
 
 
 if __name__ == '__main__':
