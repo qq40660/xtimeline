@@ -42,7 +42,7 @@ class RedisNoConnException(Exception):
 
 
 class SimpleCache(object):
-    def __init__(self, limit=1000, expire=60 * 60 * 4, set_name=None,
+    def __init__(self, limit=1000, expire=60 * 60 * 2, set_name=None,
                  hashkeys=False, host=None, port=None, db=None):
 
         self.limit = limit  # No of json encoded strings to cache
@@ -88,8 +88,13 @@ class SimpleCache(object):
         set_name = self.get_set_name()
 
         while self.connection.scard(set_name) >= self.limit:
-            del_key = self.connection.spop(set_name)
-            self.connection.delete(self.make_key(del_key))
+            skeys = self.connection.smembers(set_name)
+            for skey in skeys:
+                expire_time = self.connection.ttl(self.make_key(skey))
+                if expire_time > 0:
+                    continue
+                del_key = self.connection.srem(set_name, skey)
+                self.connection.delete(self.make_key(del_key))
 
         pipe = self.connection.pipeline()
         if expire is None:
@@ -117,11 +122,6 @@ class SimpleCache(object):
 
     def exists(self, key):
         key = to_unicode(key)
-        if key in self:
-            val = self.connection.get(self.make_key(key))
-            if val is None:  # expired key
-                self.connection.srem(self.get_set_name(), key)
-                return False
         return self.connection.sismember(self.get_set_name(), key)
 
     def get_json(self, key):
