@@ -19,7 +19,7 @@ def store_status(status, followers_count=0, db=1):  # 0 mysql 1 psql 2 mongo
     else:
         if status.get('retweeted_status_id', 0):
             retweeted_status = Statuses.query.filter(Statuses.wid == status['retweeted_status_id']).first()
-            if retweeted_status and followers_count > 20000:
+            if retweeted_status and followers_count >= 20000:
                 retweeted_status.counter += 1
                 db_session.add(retweeted_status)
         status = Statuses(**status)
