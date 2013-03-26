@@ -9,4 +9,4 @@ def scores(reposts_count, comments_count, counter=1):
         comments_count = reposts_count + (comments_count - reposts_count) * 0.1
     if comments_count < reposts_count * 0.1:
         reposts_count = comments_count + (reposts_count - comments_count) * 0.1
-    return log(reposts_count * 0.2 + comments_count * 5 + counter * 200)
+    return log(reposts_count * 0.2 + comments_count * 5 + counter * 400)
