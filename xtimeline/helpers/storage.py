@@ -100,3 +100,13 @@ def store_timeline(timeline):
             store_user_history(retweeted_status_user) #保持用户历史
     return len(timeline)
 
+
+def get_user_account(access_token):
+    account = WeiboAccounts.query.filter(WeiboAccounts.access_token == access_token).first()
+    return account.uid, account.username, account.password
+
+
+def update_access_token(uid, access_token, expires_in):
+    WeiboAccounts.query.filter(WeiboAccounts.uid == uid).update(
+        {WeiboAccounts.access_token: access_token, WeiboAccounts.expires_in: expires_in})
+    db_session.commit()
