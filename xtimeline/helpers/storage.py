@@ -11,24 +11,21 @@ def store_status(status, followers_count=0, db=1):  # 0 mysql 1 psql 2 mongo
         return
     if status.get('deleted', 0):
         return
-    try:
-        document = Statuses.query.filter(Statuses.wid == status['wid']).first()
-        if document:
-            document.reposts_count = status['reposts_count']
-            document.comments_count = status['comments_count']
-            db_session.add(document)
-            db_session.commit()
-        else:
-            if status.get('retweeted_status_id', 0):
-                retweeted_status = Statuses.query.filter(Statuses.wid == status['retweeted_status_id']).first()
-                if retweeted_status and followers_count >= 20000:
-                    retweeted_status.counter += 1
-                    db_session.add(retweeted_status)
-            status = Statuses(**status)
-            db_session.add(status)
-            db_session.commit()
-    except Exception:
-        print traceback.format_exc()
+    document = Statuses.query.filter(Statuses.wid == status['wid']).first()
+    if document:
+        document.reposts_count = status['reposts_count']
+        document.comments_count = status['comments_count']
+        db_session.add(document)
+        db_session.commit()
+    else:
+        if status.get('retweeted_status_id', 0):
+            retweeted_status = Statuses.query.filter(Statuses.wid == status['retweeted_status_id']).first()
+            if retweeted_status and followers_count >= 20000:
+                retweeted_status.counter += 1
+                db_session.add(retweeted_status)
+        status = Statuses(**status)
+        db_session.add(status)
+        db_session.commit()
 
 
 def store_user(user, db=1):
@@ -88,20 +85,23 @@ def store_timeline(timeline):
     if not isinstance(timeline, list):
         raise TypeError('Need list')
     for status in timeline:
-        if status.get('deleted', 0):
-            continue
-        user = status.pop('user', None)
-        store_user(user) #保持用户信息
-        store_status(status=status, followers_count=user['followers_count']) #保持微薄内容
-        store_status_history(status) #保持微薄历史
-        store_user_history(user) #保持用户历史
-        retweeted_status = status.pop('retweeted_status', None)
-        if retweeted_status:
-            retweeted_status_user = retweeted_status.pop('user', None)
-            store_user(retweeted_status_user) #保持用户信息
-            store_status(retweeted_status) #保持微薄内容
-            store_status_history(retweeted_status) #保持微薄历史
-            store_user_history(retweeted_status_user) #保持用户历史
+        try:
+            if status.get('deleted', 0):
+                continue
+            user = status.pop('user', None)
+            store_user(user) #保持用户信息
+            store_status(status=status, followers_count=user['followers_count']) #保持微薄内容
+            store_status_history(status) #保持微薄历史
+            store_user_history(user) #保持用户历史
+            retweeted_status = status.pop('retweeted_status', None)
+            if retweeted_status:
+                retweeted_status_user = retweeted_status.pop('user', None)
+                store_user(retweeted_status_user) #保持用户信息
+                store_status(retweeted_status) #保持微薄内容
+                store_status_history(retweeted_status) #保持微薄历史
+                store_user_history(retweeted_status_user) #保持用户历史
+        except Exception:
+            print traceback.format_exc()
     return len(timeline)
 
 
