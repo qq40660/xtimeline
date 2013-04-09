@@ -1,5 +1,6 @@
 #!/usr/bin python
 # -*- coding: utf-8 -*-
+import traceback
 from xtimeline.models.database import Statuses, Users, db_session, WeiboAccounts
 
 __author__ = 'Tony.Shao'
@@ -10,21 +11,24 @@ def store_status(status, followers_count=0, db=1):  # 0 mysql 1 psql 2 mongo
         return
     if status.get('deleted', 0):
         return
-    document = Statuses.query.filter(Statuses.wid == status['wid']).first()
-    if document:
-        document.reposts_count = status['reposts_count']
-        document.comments_count = status['comments_count']
-        db_session.add(document)
-        db_session.commit()
-    else:
-        if status.get('retweeted_status_id', 0):
-            retweeted_status = Statuses.query.filter(Statuses.wid == status['retweeted_status_id']).first()
-            if retweeted_status and followers_count >= 20000:
-                retweeted_status.counter += 1
-                db_session.add(retweeted_status)
-        status = Statuses(**status)
-        db_session.add(status)
-        db_session.commit()
+    try:
+        document = Statuses.query.filter(Statuses.wid == status['wid']).first()
+        if document:
+            document.reposts_count = status['reposts_count']
+            document.comments_count = status['comments_count']
+            db_session.add(document)
+            db_session.commit()
+        else:
+            if status.get('retweeted_status_id', 0):
+                retweeted_status = Statuses.query.filter(Statuses.wid == status['retweeted_status_id']).first()
+                if retweeted_status and followers_count >= 20000:
+                    retweeted_status.counter += 1
+                    db_session.add(retweeted_status)
+            status = Statuses(**status)
+            db_session.add(status)
+            db_session.commit()
+    except Exception:
+        print traceback.format_exc()
 
 
 def store_user(user, db=1):
